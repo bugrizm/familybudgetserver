@@ -26,7 +26,7 @@ public class DeletePaymentAction implements Action {
 			return new Result("HATA: " + e.getMessage(), true);
 		}
 		
-		return new Result("Ödeme baþarýyla silindi.", false);
+		return new Result("Odeme basariyla silindi.", false);
 		
 	}
 
