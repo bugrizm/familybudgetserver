@@ -30,7 +30,7 @@ public class AddTagToPaymentAction implements Action {
 		Tag attachedTag = entityManager.find(Tag.class, tagId);
 		
 		if(attachedPayment == null || attachedTag == null) {
-			return new Result("Ýlgili ödeme veya etiket veritabanýnda bulunmamaktadýr.", true);
+			return new Result("Ilgili odeme veya etiket veritabaninda bulunmamaktadir.", true);
 		}
 		
 		paymentTag.setPayment(attachedPayment);
@@ -38,7 +38,7 @@ public class AddTagToPaymentAction implements Action {
 		
 		entityManager.persist(paymentTag);
 		
-		return new Result("Etiket ödemeye baþarýyla eklendi.", false);
+		return new Result("Etiket odemeye basariyla eklendi.", false);
 	}
 
 }
