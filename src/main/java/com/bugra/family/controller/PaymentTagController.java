@@ -37,7 +37,7 @@ public class PaymentTagController {
 			.setParameter("tagId", tagId)
 			.executeUpdate();
 		
-		return new Result("Etiket ödemeden baþarýyla çýkarýlmýþtýr.", false);
+		return new Result("Etiket odemeden basariyla cikarilmistir.", false);
 	}
 	
 }

@@ -24,7 +24,7 @@ public class IsTagWithSameNameNotExists implements Checker {
 										.getResultList().size() > 0;
 		
 		if(hasData) {
-			return new Result("Aynı isimde bir etiket bulunmaktadır.", true);
+			return new Result("Ayni isimde bir etiket bulunmaktadir.", true);
 		}
 		
 		return new Result(false);

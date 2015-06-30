@@ -27,7 +27,7 @@ public class IsTagNotAlreadyAdded implements Checker {
 							.getResultList().size() > 0;
 		
 		if(hasData) {
-			return new Result("Etiket ödemeye zaten eklenmiş", true);
+			return new Result("Etiket odemeye zaten eklenmis", true);
 		}
 		
 		return new Result(false);

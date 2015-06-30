@@ -15,7 +15,7 @@ public class IsParametersNotNull implements Checker {
 	public Result check() {
 		for (Object object : parameter) {
 			if(object == null) {
-				return new Result("Eksik veri giriþi.", true);
+				return new Result("Eksik veri girisi.", true);
 			}
 		}
 		return new Result(false);

@@ -26,7 +26,7 @@ public class SavePaymentAction implements Action {
 			return new Result("HATA: " + e.getMessage(), true);
 		}
 		
-		return new Result("Ödeme baþarýyla eklendi.", false);
+		return new Result("Odeme basariyla eklendi.", false);
 	}
 
 }
