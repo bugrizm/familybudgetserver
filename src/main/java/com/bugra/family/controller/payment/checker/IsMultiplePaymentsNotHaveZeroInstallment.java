@@ -15,7 +15,7 @@ public class IsMultiplePaymentsNotHaveZeroInstallment implements Checker {
 	@Override
 	public Result check() {
 		if(payment.getIsMultiple() && payment.getInstallmentAmount() <= 0) {
-			return new Result("Taksit sayýsý 0'dan büyük bir deðer olmalýdýr.", true);
+			return new Result("Taksit sayisi 0'dan buyuk bir deger olmalidir.", true);
 		}
 		
 		return new Result(false);
