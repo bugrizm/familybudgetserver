@@ -18,23 +18,29 @@ public class PaymentTag implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	private int id;
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@JsonIgnore
+	private Integer id;
 
 	@ManyToOne
 	@JsonIgnore
 	private Payment payment;
 
 	@ManyToOne
+	@JsonIgnore
 	private Tag tag;
 
+	@Column(name = "tag_id", insertable=false, updatable=false)
+	private Integer tagId;
+	
 	public PaymentTag() {
 	}
 
-	public int getId() {
+	public Integer getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -52,6 +58,14 @@ public class PaymentTag implements Serializable {
 
 	public void setTag(Tag tag) {
 		this.tag = tag;
+	}
+
+	public Integer getTagId() {
+		return tagId;
+	}
+
+	public void setTagId(Integer tagId) {
+		this.tagId = tagId;
 	}
 
 }

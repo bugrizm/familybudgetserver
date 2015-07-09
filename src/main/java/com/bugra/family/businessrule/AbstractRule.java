@@ -5,7 +5,7 @@ import java.util.List;
 
 public class AbstractRule implements Rule {
 
-	private List<Checker> checkerList;
+	private List<Checker> checkerList = new ArrayList<Checker>();
 	private Action action;
 	
 	@Override
@@ -13,7 +13,7 @@ public class AbstractRule implements Rule {
 		for (Checker checker : checkerList) {
 			Result result = checker.check();
 			
-			if(result.hasError()) {
+			if(result.getHasError()) {
 				return result;
 			}
 		}

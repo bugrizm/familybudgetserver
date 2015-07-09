@@ -21,6 +21,7 @@ public class Tag implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
 
 	@Column(name="limit_amount")
@@ -28,11 +29,15 @@ public class Tag implements Serializable {
 
 	private String name;
 
-	//bi-directional many-to-one association to PaymentTag
 	@OneToMany(mappedBy="tag")
 	@JsonIgnore
 	private List<PaymentTag> payments;
-
+	
+	private String color;
+	
+	@Column(name="icon_text")
+	private String iconText;
+	
 	public Tag() {
 	}
 
@@ -80,6 +85,22 @@ public class Tag implements Serializable {
 		payment.setTag(null);
 
 		return payment;
+	}
+
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
+	}
+
+	public String getIconText() {
+		return iconText;
+	}
+
+	public void setIconText(String iconText) {
+		this.iconText = iconText;
 	}
 
 }

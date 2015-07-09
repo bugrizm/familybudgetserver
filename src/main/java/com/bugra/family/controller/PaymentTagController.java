@@ -25,7 +25,7 @@ public class PaymentTagController {
 	public Result addLabelToPayment(@PathVariable("paymentId") Integer paymentId, @PathVariable("tagId") Integer tagId) {
 		logger.info("addLabelToPayment");
 		
-		return new AddTagToPaymentRule(paymentId, tagId).apply();
+		return new AddTagToPaymentRule(paymentId, tagId, entityManager).apply();
 	}
 	
 	@RequestMapping(value = "/paymenttag/{paymentId}/{tagId}", method = RequestMethod.DELETE)

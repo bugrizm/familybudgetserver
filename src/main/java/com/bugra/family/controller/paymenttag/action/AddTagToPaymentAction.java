@@ -1,7 +1,6 @@
 package com.bugra.family.controller.paymenttag.action;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import com.bugra.family.businessrule.Action;
 import com.bugra.family.businessrule.Result;
@@ -11,15 +10,15 @@ import com.bugra.family.entity.Tag;
 
 public class AddTagToPaymentAction implements Action {
 	
-	@PersistenceContext
 	private EntityManager entityManager;
 	
 	private Integer paymentId;
 	private Integer tagId;
 
-	public AddTagToPaymentAction(Integer paymentId, Integer tagId) {
+	public AddTagToPaymentAction(Integer paymentId, Integer tagId, EntityManager entityManager) {
 		this.paymentId = paymentId;
 		this.tagId = tagId;
+		this.entityManager = entityManager;
 	}
 	
 	@Override

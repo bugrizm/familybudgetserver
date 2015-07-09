@@ -1,14 +1,26 @@
 package com.bugra.family.entity;
 
 import java.io.Serializable;
-
-import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 /**
@@ -22,7 +34,8 @@ public class Payment implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	private int id;
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private Integer id;
 
 	private BigDecimal amount;
 
@@ -37,23 +50,27 @@ public class Payment implements Serializable {
 
 	@ManyToOne
 	@JoinColumn(name="parent_id")
+	@JsonIgnore
 	private Payment parentPayment;
 
-	@OneToMany(mappedBy="parentPayment", fetch=FetchType.EAGER)
+	@OneToMany(mappedBy="parentPayment", fetch=FetchType.EAGER, cascade=CascadeType.REMOVE)
 	@JsonIgnore
 	private List<Payment> childPayments;
 
-	@OneToMany(mappedBy="payment", fetch=FetchType.EAGER)
+	@OneToMany(mappedBy="payment", fetch=FetchType.EAGER, cascade=CascadeType.REMOVE)
 	private List<PaymentTag> tags;
-
+		
+	@Column(name="parent_id", insertable=false, updatable=false)
+	private Integer parentId;
+	
 	public Payment() {
 	}
 
-	public int getId() {
+	public Integer getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -147,6 +164,14 @@ public class Payment implements Serializable {
 		tag.setPayment(null);
 
 		return tag;
+	}
+
+	public Integer getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(Integer parentId) {
+		this.parentId = parentId;
 	}
 
 }

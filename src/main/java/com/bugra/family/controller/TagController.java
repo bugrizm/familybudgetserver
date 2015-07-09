@@ -38,7 +38,7 @@ public class TagController {
 	public Result saveTag(@RequestBody Tag tag) {
 		logger.info("saveTag");
 		
-		return new SaveTagRule(tag).apply();
+		return new SaveTagRule(tag, entityManager).apply();
 	}
 	
 	@RequestMapping(value = "/tag/{tagId}", method = RequestMethod.DELETE)
@@ -47,7 +47,7 @@ public class TagController {
 
 		Tag removedTag = entityManager.find(Tag.class, tagId);
 		
-		return new RemoveTagRule(removedTag).apply();
+		return new RemoveTagRule(removedTag, entityManager).apply();
 	}
 
 }

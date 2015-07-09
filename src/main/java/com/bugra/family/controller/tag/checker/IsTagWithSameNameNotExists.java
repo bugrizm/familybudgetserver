@@ -1,20 +1,19 @@
 package com.bugra.family.controller.tag.checker;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import com.bugra.family.businessrule.Checker;
 import com.bugra.family.businessrule.Result;
 
 public class IsTagWithSameNameNotExists implements Checker {
 
-	@PersistenceContext
 	private EntityManager entityManager;
 	
 	private String tagName;
 
-	public IsTagWithSameNameNotExists(String tagName) {
+	public IsTagWithSameNameNotExists(String tagName, EntityManager entityManager) {
 		this.tagName = tagName;
+		this.entityManager = entityManager;
 	}
 	
 	@Override
