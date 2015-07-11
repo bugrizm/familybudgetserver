@@ -92,15 +92,9 @@ public class PaymentController {
 	public Result deletePayment(@PathVariable("paymentId") Integer paymentId) {
 		logger.info("deletePayment");
 
-		return deletePayment(paymentId, false);
-	}
-	
-	@RequestMapping(value = "/payment/{paymentId}/{removeOtherInstallments}", method = RequestMethod.DELETE)
-	public Result deletePayment(@PathVariable("paymentId") Integer paymentId, @PathVariable("removeOtherInstallments") boolean removeOtherInstallments) {
-		logger.info("deletePayment");
 		Payment removedPayment = entityManager.find(Payment.class, paymentId);
 		
-		return new DeletePaymentRule(removedPayment, removeOtherInstallments, entityManager).apply();
+		return new DeletePaymentRule(removedPayment, entityManager).apply();
 	}
 	
 }

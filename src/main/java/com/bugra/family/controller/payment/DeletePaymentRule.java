@@ -8,8 +8,8 @@ import com.bugra.family.entity.Payment;
 
 public class DeletePaymentRule extends AbstractRule {
 	
-	public DeletePaymentRule(Payment payment, boolean removeOtherInstallments, EntityManager entityManager) {
-		setAction(new DeletePaymentAction(payment, removeOtherInstallments, entityManager));
+	public DeletePaymentRule(Payment payment, EntityManager entityManager) {
+		setAction(new DeletePaymentAction(payment, entityManager));
 	}
 	
 }

@@ -11,19 +11,16 @@ public class DeletePaymentAction implements Action {
 	private EntityManager entityManager;
 	
 	private Payment payment;
-
-	private boolean removeOtherInstallments;
 	
-	public DeletePaymentAction(Payment payment, boolean removeOtherInstallments, EntityManager entityManager) {
+	public DeletePaymentAction(Payment payment, EntityManager entityManager) {
 		this.payment = payment;
-		this.removeOtherInstallments = removeOtherInstallments;
 		this.entityManager = entityManager;
 	}
 	
 	@Override
 	public Result execute() {
 		try {
-			if(removeOtherInstallments && payment.getParentPayment() != null) {
+			if(payment.getParentPayment() != null) {
 				Payment parentPayment = entityManager.find(Payment.class, payment.getParentPayment().getId());
 				entityManager.remove(parentPayment);
 			} else {

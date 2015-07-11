@@ -79,6 +79,7 @@ public class SavePaymentAction implements Action {
 	@SuppressWarnings("unchecked")
 	private void persistNewPayment(BigDecimal amount, Date date, short month, short year, String name, Payment parentPayment) {
 		Payment newPayment = new Payment();
+		newPayment.setId(newPayment.getId());
 		newPayment.setAmount(amount);
 		newPayment.setDate(date);
 		
