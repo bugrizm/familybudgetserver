@@ -1,5 +1,6 @@
 package com.bugra.family.controller.payment.action;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -21,19 +22,19 @@ public class SavePaymentAction implements Action {
 
 	private EntityManager entityManager;
 	
-	private PaymentDTO payment;
+	private PaymentDTO paymentDTO;
 	
 	public SavePaymentAction() {}
 	
-	public SavePaymentAction(PaymentDTO payment, EntityManager entityManager) {
-		this.payment = payment;
+	public SavePaymentAction(PaymentDTO paymentDTO, EntityManager entityManager) {
+		this.paymentDTO = paymentDTO;
 		this.entityManager = entityManager;
 	}
 	
 	@Override
 	public Result execute() {
 		try {
-			if(payment.getIsMultiple()) {
+			if(paymentDTO.getIsMultiple()) {
 				createAndPersistMultiplePayments();
 			} else {
 				createAndPersistSinglePayment();
@@ -46,59 +47,51 @@ public class SavePaymentAction implements Action {
 		return new Result("Odeme basariyla eklendi.", false);
 	}
 
-	@SuppressWarnings("unchecked")
 	private void createAndPersistSinglePayment() {
-		Payment newPayment = new Payment();
-		newPayment.setAmount(payment.getAmount());
-		newPayment.setDate(getDateFromMillis());
-		newPayment.setMonth(payment.getMonth());
-		newPayment.setName(payment.getName());
-		newPayment.setYear(payment.getYear());
-		
-		entityManager.persist(newPayment);
-		
-		List<Tag> tagList = entityManager.createQuery("select t from Tag t where id in (:tagIds)")
-												.setParameter("tagIds", parseIdList())
-												.getResultList();
-		
-		
-		newPayment.setTags(new ArrayList<PaymentTag>());
-		for (Tag tag : tagList) {
-			PaymentTag newPt = new PaymentTag();
-			newPt.setPayment(newPayment);
-			newPt.setTag(tag);
-			
-			entityManager.persist(newPt);
-		}
-		
-		
+		persistNewPayment(paymentDTO.getAmount(), getDateFromMillis(), paymentDTO.getMonth(), paymentDTO.getYear(), paymentDTO.getName(), null);
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	private void createAndPersistMultiplePayments() {
 		Payment parentPayment = new Payment();
 		parentPayment.setDate(getDateFromMillis());
-		parentPayment.setName(payment.getName());
+		parentPayment.setName(paymentDTO.getName());
 		
 		entityManager.persist(parentPayment);
 		
 		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.MONTH, payment.getMonth());
-		calendar.set(Calendar.YEAR, payment.getYear());
+		calendar.set(Calendar.MONTH, paymentDTO.getMonth());
+		calendar.set(Calendar.YEAR, paymentDTO.getYear());
 		
-		for(int i=0; i<payment.getInstallmentAmount(); i++) {
-			Payment newPayment = new Payment();
-			newPayment.setAmount(payment.getAmount());
-			newPayment.setDate(getDateFromMillis());
-			
-			newPayment.setMonth((short)calendar.get(Calendar.MONTH));
-			newPayment.setName(payment.getName() + "(" + (i+1) + "/" + payment.getInstallmentAmount() + ")");
-			newPayment.setYear((short)calendar.get(Calendar.YEAR));
-			newPayment.setParentPayment(parentPayment);
-			
-			entityManager.persist(newPayment);
+		BigDecimal amount = paymentDTO.getAmount().divide(new BigDecimal(paymentDTO.getInstallmentAmount()));
+		
+		for(int i=0; i<paymentDTO.getInstallmentAmount(); i++) {
+			short month = (short)calendar.get(Calendar.MONTH);
+			short year = (short)calendar.get(Calendar.YEAR);
+			String name = paymentDTO.getName() + "(" + (i+1) + "/" + paymentDTO.getInstallmentAmount() + ")";
+			persistNewPayment(amount, getDateFromMillis(), month, year, name, parentPayment);
 			
 			calendar.add(Calendar.MONTH, 1);
+		}
+		
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void persistNewPayment(BigDecimal amount, Date date, short month, short year, String name, Payment parentPayment) {
+		Payment newPayment = new Payment();
+		newPayment.setAmount(amount);
+		newPayment.setDate(date);
+		
+		newPayment.setMonth(month);
+		newPayment.setName(name);
+		newPayment.setYear(year);
+		newPayment.setParentPayment(parentPayment);
+		
+		entityManager.persist(newPayment);
+		
+		List<Integer> tagIdList = parseIdList();
+		
+		if(!tagIdList.isEmpty()) {
 			
 			List<Tag> tagList = entityManager.createQuery("select t from Tag t where id in (:tagIds)")
 					.setParameter("tagIds", parseIdList())
@@ -115,14 +108,13 @@ public class SavePaymentAction implements Action {
 				entityManager.persist(newPt);
 			}
 		}
-		
 	}
 	
 	private List<Integer> parseIdList() {
 		List<Integer> tagIdList = new ArrayList<Integer>();
 		
-		if(payment.getTagIdList() != null) {
-			String[] tags = payment.getTagIdList().split(",");
+		if(paymentDTO.getTagIdList() != null) {
+			String[] tags = paymentDTO.getTagIdList().split(",");
 			
 			for (String string : tags) {
 				if(!string.equals("")) {
@@ -136,7 +128,7 @@ public class SavePaymentAction implements Action {
 	
 	private Date getDateFromMillis() {
 		Calendar calendar = Calendar.getInstance();
-		calendar.setTimeInMillis(payment.getDate());
+		calendar.setTimeInMillis(paymentDTO.getDate());
 		return calendar.getTime();
 	}
 

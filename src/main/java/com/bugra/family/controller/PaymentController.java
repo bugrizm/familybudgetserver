@@ -46,13 +46,13 @@ public class PaymentController {
 	}
 	
 	@RequestMapping(value = "/payment/{year}/{month}/{tagName}", method = RequestMethod.GET)
-	public List<Payment> getPayments(@PathVariable("year") Short year, @PathVariable("month") Short month, @PathVariable("tagName") String tagName) {
+	public List<Payment> getPayments(@PathVariable("year") Short year, @PathVariable("month") Short month, @PathVariable("tagName") Integer tagId) {
 		logger.info("getPayments with year, month and tag");
 		
-		return entityManager.createQuery("SELECT p FROM Payment p, PaymentTag pt, Tag t WHERE p.id=pt.payment.id AND t.id=pt.tag.id AND p.year=:year AND p.month=:month AND t.name=:tagName")
+		return entityManager.createQuery("SELECT p FROM Payment p, PaymentTag pt, Tag t WHERE p.id=pt.payment.id AND t.id=pt.tag.id AND p.year=:year AND p.month=:month AND t.id=:tagId")
 				.setParameter("month", month)
 				.setParameter("year", year)
-				.setParameter("tagName", tagName)
+				.setParameter("tagId", tagId)
 				.getResultList();
 	}
 	
