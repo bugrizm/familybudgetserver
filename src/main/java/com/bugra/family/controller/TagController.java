@@ -17,6 +17,7 @@ import com.bugra.family.businessrule.Result;
 import com.bugra.family.controller.tag.RemoveTagRule;
 import com.bugra.family.controller.tag.SaveTagRule;
 import com.bugra.family.entity.Tag;
+import com.bugra.family.entity.TagDTO;
 
 @RestController
 @SuppressWarnings("unchecked")
@@ -35,10 +36,10 @@ public class TagController {
 	}
 	
 	@RequestMapping(value = "/tag", method = RequestMethod.POST)
-	public Result saveTag(@RequestBody Tag tag) {
+	public Result saveTag(@RequestBody TagDTO tagDTO) {
 		logger.info("saveTag");
 		
-		return new SaveTagRule(tag, entityManager).apply();
+		return new SaveTagRule(tagDTO, entityManager).apply();
 	}
 	
 	@RequestMapping(value = "/tag/{tagId}", method = RequestMethod.DELETE)
