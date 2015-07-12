@@ -24,9 +24,6 @@ public class Tag implements Serializable {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
 
-	@Column(name="limit_amount")
-	private BigDecimal limitAmount;
-
 	private String name;
 
 	@OneToMany(mappedBy="tag")
@@ -47,14 +44,6 @@ public class Tag implements Serializable {
 
 	public void setId(int id) {
 		this.id = id;
-	}
-
-	public BigDecimal getLimitAmount() {
-		return this.limitAmount;
-	}
-
-	public void setLimitAmount(BigDecimal limitAmount) {
-		this.limitAmount = limitAmount;
 	}
 
 	public String getName() {
