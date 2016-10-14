@@ -14,7 +14,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -29,7 +28,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name="payment")
-@NamedQuery(name="Payment.findAll", query="SELECT p FROM Payment p")
 public class Payment implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -57,8 +55,13 @@ public class Payment implements Serializable {
 	@JsonIgnore
 	private List<Payment> childPayments;
 
-	@OneToMany(mappedBy="payment", fetch=FetchType.EAGER, cascade=CascadeType.REMOVE)
-	private List<PaymentTag> tags;
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="tag_id")
+	@JsonIgnore
+	private Tag tag;
+	
+	@Column(name="tag_id", insertable=false, updatable=false)
+	private Integer tagId;
 		
 	@Column(name="parent_id", insertable=false, updatable=false)
 	private Integer parentId;
@@ -144,26 +147,12 @@ public class Payment implements Serializable {
 		return childPayment;
 	}
 
-	public List<PaymentTag> getTags() {
-		return this.tags;
+	public Tag getTag() {
+		return this.tag;
 	}
 
-	public void setTags(List<PaymentTag> tags) {
-		this.tags = tags;
-	}
-
-	public PaymentTag addTag(PaymentTag tag) {
-		getTags().add(tag);
-		tag.setPayment(this);
-
-		return tag;
-	}
-
-	public PaymentTag removeTag(PaymentTag tag) {
-		getTags().remove(tag);
-		tag.setPayment(null);
-
-		return tag;
+	public void setTag(Tag tag) {
+		this.tag = tag;
 	}
 
 	public Integer getParentId() {
@@ -172,6 +161,14 @@ public class Payment implements Serializable {
 
 	public void setParentId(Integer parentId) {
 		this.parentId = parentId;
+	}
+
+	public Integer getTagId() {
+		return tagId;
+	}
+
+	public void setTagId(Integer tagId) {
+		this.tagId = tagId;
 	}
 
 }

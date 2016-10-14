@@ -9,6 +9,7 @@ import javax.persistence.PersistenceContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,12 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bugra.family.businessrule.Result;
-import com.bugra.family.controller.payment.DeletePaymentRule;
-import com.bugra.family.controller.payment.SavePaymentRule;
-import com.bugra.family.entity.MonthSummaryDTO;
 import com.bugra.family.entity.Payment;
 import com.bugra.family.entity.PaymentDTO;
+import com.bugra.family.entity.SummaryDTO;
 
 @RestController
 @SuppressWarnings("unchecked")
@@ -30,26 +28,27 @@ public class PaymentController {
 
 	@PersistenceContext
 	private EntityManager entityManager;
-		
+	
+	@Autowired
+	private PaymentControllerHelper helper;
+	
 	private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
 	
 	@RequestMapping(value = "/payment/{year}/{month}", method = RequestMethod.GET)
 	public List<Payment> getPayments(@PathVariable("year") Short year, @PathVariable("month") Short month) {
 		logger.info("getPayments with year and month");
-		
-		List<Payment> deneme = entityManager.createQuery("SELECT p FROM Payment p WHERE year=:year AND month=:month")
+				
+		return entityManager.createQuery("SELECT p FROM Payment p WHERE year=:year AND month=:month")
 				.setParameter("month", month)
 				.setParameter("year", year)
 				.getResultList();
-		
-		return deneme;
 	}
 	
-	@RequestMapping(value = "/payment/{year}/{month}/{tagName}", method = RequestMethod.GET)
-	public List<Payment> getPayments(@PathVariable("year") Short year, @PathVariable("month") Short month, @PathVariable("tagName") Integer tagId) {
+	@RequestMapping(value = "/payment/{year}/{month}/{tagId}", method = RequestMethod.GET)
+	public List<Payment> getPayments(@PathVariable("year") Short year, @PathVariable("month") Short month, @PathVariable("tagId") Integer tagId) {
 		logger.info("getPayments with year, month and tag");
 		
-		return entityManager.createQuery("SELECT p FROM Payment p, PaymentTag pt, Tag t WHERE p.id=pt.payment.id AND t.id=pt.tag.id AND p.year=:year AND p.month=:month AND t.id=:tagId")
+		return entityManager.createQuery("SELECT p FROM Payment p WHERE year=:year AND month=:month AND tag.id=:tagId")
 				.setParameter("month", month)
 				.setParameter("year", year)
 				.setParameter("tagId", tagId)
@@ -57,11 +56,11 @@ public class PaymentController {
 	}
 	
 	@RequestMapping(value = "/month_summary/{year}/{month}", method = RequestMethod.GET)
-	public List<MonthSummaryDTO> getMonthSummary(@PathVariable("year") Short year, @PathVariable("month") Short month) {
+	public List<SummaryDTO> getMonthSummary(@PathVariable("year") Short year, @PathVariable("month") Short month) {
 		logger.info("getMonthSummary");
 		
-		List<Object[]> resultList = entityManager.createNativeQuery("select pt.tag_id, sum(p.amount) from payment p inner join payment_tag pt on p.id = pt.payment_id "
-																	+ "and p.month=:month and p.year = :year group by pt.tag_id")
+		List<Object[]> resultList = entityManager.createNativeQuery("select p.tag_id, sum(p.amount) from payment p inner join tag t "
+																	+ "where p.tag_id = t.id and p.month=:month and p.year = :year group by p.tag_id order by t.name")
 												.setParameter("month", month)
 												.setParameter("year", year)
 												.getResultList();
@@ -71,30 +70,69 @@ public class PaymentController {
 															.setParameter("year", year)
 															.getSingleResult();
 		
-		List<MonthSummaryDTO> monthSummaryList = new ArrayList<MonthSummaryDTO>();
-		monthSummaryList.add(new MonthSummaryDTO(null, totalAmount));
+		List<SummaryDTO> monthSummaryList = new ArrayList<SummaryDTO>();
+		monthSummaryList.add(new SummaryDTO(null, totalAmount));
 		
 		for (Object[] objects : resultList) {
-			monthSummaryList.add(new MonthSummaryDTO((Integer)objects[0], (BigDecimal)objects[1]));
+			monthSummaryList.add(new SummaryDTO((Integer)objects[0], (BigDecimal)objects[1]));
 		}
 		
 		return monthSummaryList;
 	}
 	
+	@RequestMapping(value = "/year_summary/{year}", method = RequestMethod.GET)
+	public List<SummaryDTO> getYearSummary(@PathVariable("year") Short year) {
+		logger.info("getYearSummary");
+		
+		List<Object[]> resultList = entityManager.createNativeQuery("select p.tag_id, sum(p.amount) from payment p inner join tag t "
+																	+ "where p.tag_id = t.id and p.year = :year group by p.tag_id order by t.name")
+												.setParameter("year", year)
+												.getResultList();
+				
+		BigDecimal totalAmount = (BigDecimal) entityManager.createNativeQuery("select sum(amount) from payment where year = :year")
+															.setParameter("year", year)
+															.getSingleResult();
+		
+		List<SummaryDTO> yearSummaryList = new ArrayList<SummaryDTO>();
+		yearSummaryList.add(new SummaryDTO(null, totalAmount));
+		
+		for (Object[] objects : resultList) {
+			yearSummaryList.add(new SummaryDTO((Integer)objects[0], (BigDecimal)objects[1]));
+		}
+		
+		return yearSummaryList;
+	}
+	
 	@RequestMapping(value = "/payment", method = RequestMethod.POST)
-	public Result savePayment(@RequestBody PaymentDTO payment) {
+	public void savePayment(@RequestBody PaymentDTO payment) {
 		logger.info("savePayment");
 		
-		return new SavePaymentRule(payment, entityManager).apply();
+		if(!helper.isParametersForSaveOperationEnough(payment)) {
+			throw new RuntimeException("Eksik veri girişi.");
+		}
+		if(payment.getIsMultiple() && payment.getInstallmentAmount() <= 0) {
+			throw new RuntimeException("Taksit sayisi 0'dan buyuk bir deger olmalidir.");
+		}
+		
+		if(payment.getIsMultiple()) {
+			helper.createMultiplePayments(payment);
+		} else {
+			helper.createSinglePayment(payment);
+		}
 	}
 	
 	@RequestMapping(value = "/payment/{paymentId}", method = RequestMethod.DELETE)
-	public Result deletePayment(@PathVariable("paymentId") Integer paymentId) {
+	public void deletePayment(@PathVariable("paymentId") Integer paymentId) {
 		logger.info("deletePayment");
 
 		Payment removedPayment = entityManager.find(Payment.class, paymentId);
 		
-		return new DeletePaymentRule(removedPayment, entityManager).apply();
+		helper.deletePayment(removedPayment);
+	}
+	
+	@RequestMapping(value = "/transfer_exceeded_budgets/{year}/{month}", method = RequestMethod.POST)
+	public void transferExceededBudgetsToNextMonth(@PathVariable("year") Short year, @PathVariable("month") Short month) {
+		helper.transferBudgets(year, month);
 	}
 	
 }

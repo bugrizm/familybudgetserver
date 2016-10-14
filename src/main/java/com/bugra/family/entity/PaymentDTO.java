@@ -9,7 +9,7 @@ public class PaymentDTO {
 	private Short month;
 	private String name;
 	private Short year;
-	private String tagIdList;
+	private int tagId;
     private boolean isMultiple;
     private int installmentAmount;
     
@@ -43,11 +43,11 @@ public class PaymentDTO {
 	public void setYear(Short year) {
 		this.year = year;
 	}
-	public String getTagIdList() {
-		return tagIdList;
+	public int getTagId() {
+		return tagId;
 	}
-	public void setTagIdList(String tagIdList) {
-		this.tagIdList = tagIdList;
+	public void setTagId(int tagId) {
+		this.tagId = tagId;
 	}
 	public boolean getIsMultiple() {
 		return isMultiple;

@@ -1,18 +1,14 @@
 package com.bugra.family.entity;
 
 import java.io.Serializable;
-import java.util.List;
+import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 /**
@@ -21,7 +17,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name="tag")
-@NamedQuery(name="Tag.findAll", query="SELECT t FROM Tag t")
 public class Tag implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -31,14 +26,13 @@ public class Tag implements Serializable {
 
 	private String name;
 
-	@OneToMany(mappedBy="tag")
-	@JsonIgnore
-	private List<PaymentTag> payments;
-	
 	private String color;
 	
 	@Column(name="icon_text")
 	private String iconText;
+	
+	@Column(name = "\"limit\"")
+	private BigDecimal limit;
 	
 	public Tag() {
 	}
@@ -59,28 +53,6 @@ public class Tag implements Serializable {
 		this.name = name;
 	}
 
-	public List<PaymentTag> getPayments() {
-		return this.payments;
-	}
-
-	public void setPayments(List<PaymentTag> payments) {
-		this.payments = payments;
-	}
-
-	public PaymentTag addPayment(PaymentTag payment) {
-		getPayments().add(payment);
-		payment.setTag(this);
-
-		return payment;
-	}
-
-	public PaymentTag removePayment(PaymentTag payment) {
-		getPayments().remove(payment);
-		payment.setTag(null);
-
-		return payment;
-	}
-
 	public String getColor() {
 		return color;
 	}
@@ -95,6 +67,14 @@ public class Tag implements Serializable {
 
 	public void setIconText(String iconText) {
 		this.iconText = iconText;
+	}
+
+	public BigDecimal getLimit() {
+		return limit;
+	}
+
+	public void setLimit(BigDecimal limit) {
+		this.limit = limit;
 	}
 
 }

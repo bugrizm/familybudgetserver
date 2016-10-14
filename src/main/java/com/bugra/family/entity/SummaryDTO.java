@@ -2,12 +2,12 @@ package com.bugra.family.entity;
 
 import java.math.BigDecimal;
 
-public class MonthSummaryDTO {
+public class SummaryDTO {
 	
 	private Integer tagId;
 	private BigDecimal totalAmount;
 	
-	public MonthSummaryDTO(Integer tagId, BigDecimal totalAmount) {
+	public SummaryDTO(Integer tagId, BigDecimal totalAmount) {
 		this.tagId = tagId;
 		this.totalAmount = totalAmount;
 	}

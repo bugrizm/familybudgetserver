@@ -1,5 +1,7 @@
 package com.bugra.family.entity;
 
+import java.math.BigDecimal;
+
 
 public class TagDTO {
 	
@@ -7,6 +9,8 @@ public class TagDTO {
 	private String name;
 	private String iconText;
 	private String color;
+	private BigDecimal limit;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -30,6 +34,12 @@ public class TagDTO {
 	}
 	public void setColor(String color) {
 		this.color = color;
+	}
+	public BigDecimal getLimit() {
+		return limit;
+	}
+	public void setLimit(BigDecimal limit) {
+		this.limit = limit;
 	}
     
 	
